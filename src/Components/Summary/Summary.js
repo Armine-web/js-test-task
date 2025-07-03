@@ -20,17 +20,14 @@ const Text = styled.p`
   color: #6b7280;
   font-size: 14px;
   line-height: 1.5;
+  white-space: pre-wrap; /* сохраняет переносы строк */
 `;
 
-export const Summary = () => {
+export const Summary = ({ summary }) => {
   return (
     <Container>
       <SummaryTitle>Резюме</SummaryTitle>
-      <Text>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
-        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-        veniam, quis nostrud exercitation ullamco laboris.
-      </Text>
+      <Text>{summary || "Загрузка резюме..."}</Text>
     </Container>
   );
 };

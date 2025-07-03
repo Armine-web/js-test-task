@@ -1,4 +1,4 @@
-import React from "react";
+import  { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Title } from "./Components/Title/Title";
 import { Summary } from "./Components/Summary/Summary";
@@ -18,11 +18,77 @@ const AppContainer = styled.div`
   color: #111827;
 `;
 
+const Input = styled.input`
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  margin-top: 8px;
+`;
+
+const Button = styled.button`
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+
+  &:hover {
+    background: #4338ca;
+  }
+`;
+
+const Message = styled.div`
+  margin-top: 10px;
+  color: green;
+`;
+
 export const App = ({ summary }) => {
+  const [key, setKey] = useState("");
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    const storedKey = localStorage.getItem("gemini_api_key");
+    if (storedKey) {
+      setKey(storedKey); 
+      setSaved(true);
+    }
+  }, []);
+
+  const handleSave = () => {
+    if (key.trim()) {
+      localStorage.setItem("gemini_api_key", key.trim());
+      setSaved(true);
+    }
+  };
+
   return (
     <AppContainer>
       <Title />
+      {!saved ? (
+        <>
+          <div>Введите Gemini ключ:</div>
+
+          <Input
+            type="password"
+            placeholder="sk-..."
+            value={key}
+            onChange={(e) => setKey(e.target.value)}
+          />
+          <Button onClick={handleSave}>
+            Сохранить
+          </Button>
+        </>
+      ) : (
+        <Message>✅ API ключ сохранён</Message>
+      )}
+
       <Summary summary={summary} />
     </AppContainer>
   );
 };
+

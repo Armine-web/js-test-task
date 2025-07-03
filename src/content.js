@@ -7,41 +7,54 @@ function parseMessagesFromChat(limit = 30) {
   const messages = Array.from(messageNodes)
     .map((node) => node.innerText.trim())
     .filter(Boolean)
-    .slice(-limit); 
+    .slice(-limit);
 
   return messages.join("\n");
 }
 
 async function generateSummary(chatText) {
-  const apiKey = localStorage.getItem("openai_api_key");
+  const key = localStorage.getItem("gemini_api_key");
+  console.log("🔑 Gemini API ключ:", Boolean(key));
 
-  if (!apiKey) {
-    return "❗️API ключ не задан. Укажите его в настройках расширения.";
+  if (!key) {
+    return "❗️Gemini API ключ не задан.";
   }
 
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: [
-          {
-            role: "user",
-            content: `Сделай краткое резюме следующего чата:\n\n${chatText}`,
-          },
-        ],
-      }),
-    });
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-002:generateContent?key=${key}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: `Привет, сделай краткое резюме следующего текста:\n\n${chatText}`,
+                },
+              ],
+            },
+          ],
+        }),
+      }
+    );
 
     const data = await response.json();
-    return data.choices?.[0]?.message?.content || "❗️Ошибка генерации ответа";
+
+    if (!response.ok) {
+      console.error("❌ Ошибка Gemini API:", data);
+      return `❗️Ошибка: ${data?.error?.message || "Неизвестная"}`;
+    }
+
+    return (
+      data.candidates?.[0]?.content?.parts?.[0]?.text || "❗️Ответ пустой от Gemini"
+    );
   } catch (error) {
-    console.error("Ошибка при обращении к OpenAI:", error);
-    return "❗️Ошибка при обращении к OpenAI API";
+    console.error("Ошибка при обращении к Gemini API:", error);
+    return "❗️Ошибка при обращении к Gemini API";
   }
 }
 
