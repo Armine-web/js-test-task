@@ -18,11 +18,11 @@ const AppContainer = styled.div`
   color: #111827;
 `;
 
-export const App = () => {
+export const App = ({ summary }) => {
   return (
     <AppContainer>
       <Title />
-      <Summary />
+      <Summary summary={summary} />
     </AppContainer>
   );
 };
