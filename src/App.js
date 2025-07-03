@@ -1,4 +1,4 @@
-import  { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Title } from "./Components/Title/Title";
 import { Summary } from "./Components/Summary/Summary";
@@ -47,14 +47,19 @@ const Message = styled.div`
   color: green;
 `;
 
-export const App = ({ summary }) => {
+const LoadingText = styled.div`
+  margin-top: 10px;
+  color: #4f46e5;
+  font-weight: 600;
+`;
+
+export const App = ({ summary, loading, setLoading }) => {
   const [key, setKey] = useState("");
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     const storedKey = localStorage.getItem("gemini_api_key");
     if (storedKey) {
-      setKey(storedKey); 
       setSaved(true);
     }
   }, []);
@@ -79,16 +84,15 @@ export const App = ({ summary }) => {
             value={key}
             onChange={(e) => setKey(e.target.value)}
           />
-          <Button onClick={handleSave}>
-            Сохранить
-          </Button>
+          <Button onClick={handleSave}>Сохранить</Button>
         </>
       ) : (
         <Message>✅ API ключ сохранён</Message>
       )}
 
+      {loading && <LoadingText>⏳ Загрузка...</LoadingText>}
+
       <Summary summary={summary} />
     </AppContainer>
   );
 };
-
